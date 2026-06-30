@@ -2,7 +2,7 @@
 
 A browser-based personal finance dashboard with a cinematic 3D intro, real-time charts, and tools for tracking spending, loans, and investments — built entirely with vanilla JavaScript, HTML, and CSS (no backend required).
 
-![Status](https://img.shields.io/badge/status-alpha-orange) ![Version](https://img.shields.io/badge/version-2.0.0--alpha-blue)
+![Status](https://img.shields.io/badge/status-alpha-orange) ![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue)
 
 ## Features
 
