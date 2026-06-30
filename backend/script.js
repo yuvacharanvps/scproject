@@ -735,4 +735,6 @@ function renderSIPChart(years, monthlyP, rate) {
 
         appData.charts.sipLineChart.update();
     }
-}
+}  
+
+
