@@ -52,6 +52,10 @@ No build step or dependencies to install — it's a static site.
 - [ ] Mobile sidebar navigation (sidebar is hidden under 768px — needs a menu toggle)
 - [ ] Backend API for multi-device sync
 
+## Contributors
+
+@shailesh074 
+
 ## Contributing
 
 Pull requests are welcome. For major changes, open an issue first to discuss what you'd like to change.
