@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTECH BY AMITY - 3D Finance OS</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js for 3D Intro Launch -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- 3D Three.js Canvas Container -->
+    <div id="three-container"></div>
+
+    <!-- Global Background Elements (Active after 3D intro) -->
+    <div id="global-bg" class="hidden">
+        <div class="bg-orb orb-primary"></div>
+        <div class="bg-orb orb-secondary"></div>
+        <div class="bg-grid"></div>
+    </div>
+
+    <!-- Landing View -->
+    <div id="view-landing" class="view hidden">
+        <div class="landing-content glass p-6 rounded-2xl text-center" id="landing-card">
+            <div class="logo-3d-text">FINTECH<br><span>BY AMITY</span></div>
+            <p class="mb-4 text-secondary mt-2">The Next Generation Financial OS</p>
+            <div class="input-group mt-6 mb-4">
+                <input type="number" id="startup-budget" placeholder="Enter Starting Budget (₹)" class="input-glow">
+            </div>
+            <button id="btn-enter" class="primary-btn mt-4 full-width">Initialize OS Core →</button>
+        </div>
+    </div>
+
+    <!-- Main OS Layout -->
+    <div id="main-layout" class="hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="glass">
+            <div class="sidebar-header"><div class="logo">FINTECH</div></div>
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard">
+                    <span class="nav-icon">⊞</span> Dashboard
+                </li>
+                <li data-view="transactions">
+                    <span class="nav-icon">⇄</span> Transactions
+                </li>
+                <li data-view="loans">
+                    <span class="nav-icon">🏦</span> Loans & EMI
+                </li>
+                <li data-view="investments">
+                    <span class="nav-icon">📈</span> SIP Investments
+                </li>
+                <li data-view="goals">
+                    <span class="nav-icon">🎯</span> Financial Goals
+                </li>
+                <li data-view="analytics">
+                    <span class="nav-icon">📊</span> Analytics
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <p class="text-xs text-secondary text-center">v2.0.0 Alpha</p>
+            </div>
+        </aside>
+        
+        <main id="content-area">
+            <!-- Top Navigation Bar -->
+            <header class="topbar flex-between align-center">
+                <h2 id="greeting-text">Welcome back.</h2>
+                <div class="profile-badge glass">Admin User</div>
+            </header>
+            
+            <div class="views-container">
+                <!-- ==================== DASHBOARD VIEW ==================== -->
+                <div id="view-dashboard" class="app-view active">
+                    <div class="stats-grid">
+                        <div class="stat-card glass hover-lift">
+                            <p class="text-sm text-secondary uppercase tracking-wide">Remaining Budget</p>
+                            <h3 class="amount" id="total-balance">₹0</h3>
+                        </div>
+                        <div class="stat-card glass hover-lift">
+                            <p class="text-sm text-secondary uppercase tracking-wide">Total Assets (Bank/FD)</p>
+                            <h3 class="amount text-cyan" id="total-assets">₹0</h3>
+                        </div>
+                        <div class="stat-card glass hover-lift">
+                            <p class="text-sm text-secondary uppercase tracking-wide">Total Spendings</p>
+                            <h3 class="amount text-red" id="total-expenses">₹0</h3>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-widgets">
+                        <!-- Add Transaction Widget -->
+                        <div class="widget glass">
+                            <h3 class="widget-title">Add New Transaction</h3>
+                            <div class="input-group">
+                                <label class="text-xs text-secondary mb-1 block">Transaction Title</label>
+                                <input type="text" id="new-txn-title" placeholder="e.g., Internet Bill">
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Amount</label>
+                                    <input type="number" id="new-txn-amount" placeholder="₹ 0.00">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Date</label>
+                                    <input type="date" id="new-txn-date">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label class="text-xs text-secondary mb-1 block">Category</label>
+                                <select id="new-txn-cat" class="select-input full-width mt-1">
+                                    <option value="Housing">Housing</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <button class="primary-btn mt-4 full-width pulse-btn" id="btn-add-txn">Record Transaction</button>
+                        </div>
+                        
+                        <!-- Recent Transactions -->
+                        <div class="widget glass">
+                            <h3 class="widget-title flex-between">Recent Transactions <span class="text-xs text-cyan cursor-pointer" id="view-all-txns">View All</span></h3>
+                            <div class="recent-list" id="recent-transactions"></div>
+                        </div>
+
+                        <!-- Bank Accounts Widget -->
+                        <div class="widget glass">
+                            <h3 class="widget-title">Bank Accounts & FDs</h3>
+                            <div class="recent-list" id="accounts-list"></div>
+                            <div class="divider mt-4 mb-4"></div>
+                            <div class="flex gap-4 mt-2">
+                                <div class="input-group full-width">
+                                    <input type="text" id="new-acc-name" placeholder="Name (e.g. SBI FD)">
+                                </div>
+                                <div class="input-group full-width">
+                                    <input type="number" id="new-acc-bal" placeholder="Balance (₹)">
+                                </div>
+                            </div>
+                            <button class="secondary-btn mt-2 full-width" id="btn-add-acc">+ Add Asset</button>
+                        </div>
+
+                        <!-- Mini Interest Calculator -->
+                        <div class="widget glass">
+                            <h3 class="widget-title">Quick Interest Calculator</h3>
+                            <div class="input-group">
+                                <input type="number" id="calc-p" placeholder="Principal Amount (₹)">
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="input-group full-width"><input type="number" id="calc-r" placeholder="Rate (%)"></div>
+                                <div class="input-group full-width"><input type="number" id="calc-t" placeholder="Time (Yrs)"></div>
+                            </div>
+                            <div id="calc-res" class="mt-4 text-center font-bold text-cyan hidden glass-panel p-2 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TRANSACTIONS VIEW ==================== -->
+                <div id="view-transactions" class="app-view">
+                    <div class="view-header flex-between align-center">
+                        <h2>Master Ledger</h2>
+                        <button class="secondary-btn">Export CSV</button>
+                    </div>
+                    <div class="table-container glass rounded-2xl p-4">
+                        <table class="expenses-table full-width">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Transaction ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th class="text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ==================== LOANS & EMI VIEW ==================== -->
+                <div id="view-loans" class="app-view">
+                    <div class="view-header"><h2>Loan & EMI Manager</h2><p class="text-secondary">Analyze your debt burden and amortization schedules.</p></div>
+                    <div class="dashboard-widgets">
+                        <div class="widget glass">
+                            <h3 class="widget-title">Mortgage / Auto Loan Calculator</h3>
+                            <div class="input-group mt-4">
+                                <label class="text-xs text-secondary mb-1 block">Principal Loan Amount</label>
+                                <input type="number" id="emi-p" placeholder="e.g., 5000000">
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Annual Interest Rate (%)</label>
+                                    <input type="number" id="emi-r" placeholder="e.g., 8.5">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Tenure (Months)</label>
+                                    <input type="number" id="emi-t" placeholder="e.g., 240">
+                                </div>
+                            </div>
+                            <div id="emi-res" class="mt-6 text-center font-bold text-red hidden glass-panel p-4 rounded-xl text-xl"></div>
+                        </div>
+                        <div class="widget glass">
+                            <h3 class="widget-title">Amortization Summary</h3>
+                            <div class="recent-list" id="emi-schedule">
+                                <p class="text-secondary p-4 text-center border-dashed rounded mt-4">Enter loan details to generate schedule.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SIP INVESTMENTS VIEW ==================== -->
+                <div id="view-investments" class="app-view">
+                    <div class="view-header"><h2>Mutual Fund SIP Planner</h2><p class="text-secondary">Visualize the power of compounding interest.</p></div>
+                    <div class="dashboard-widgets">
+                        <div class="widget glass">
+                            <h3 class="widget-title">SIP Projection Settings</h3>
+                            <div class="input-group mt-4">
+                                <label class="text-xs text-secondary mb-1 block">Monthly Investment (₹)</label>
+                                <input type="number" id="sip-p" placeholder="e.g., 5000">
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Expected Return Rate (% p.a.)</label>
+                                    <input type="number" id="sip-r" placeholder="e.g., 12">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label class="text-xs text-secondary mb-1 block">Time Period (Years)</label>
+                                    <input type="number" id="sip-t" placeholder="e.g., 10">
+                                </div>
+                            </div>
+                            <div id="sip-res" class="mt-6 text-center font-bold text-cyan hidden glass-panel p-4 rounded-xl"></div>
+                        </div>
+                        <div class="widget glass" style="grid-column: span 2;">
+                            <h3 class="widget-title">Wealth Growth Trajectory</h3>
+                            <div class="canvas-container" style="height: 350px;"><canvas id="sipChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== GOALS VIEW ==================== -->
+                <div id="view-goals" class="app-view">
+                    <div class="view-header"><h2>Financial Goals Tracker</h2><p class="text-secondary">Align your liquid assets with your dreams.</p></div>
+                    <div class="dashboard-widgets">
+                        <div class="widget glass">
+                            <h3 class="widget-title">Create New Goal</h3>
+                            <div class="input-group mt-4">
+                                <label class="text-xs text-secondary mb-1 block">Goal Name</label>
+                                <input type="text" id="goal-name" placeholder="e.g. Dream Car, Emergency Fund">
+                            </div>
+                            <div class="input-group mt-4">
+                                <label class="text-xs text-secondary mb-1 block">Target Amount (₹)</label>
+                                <input type="number" id="goal-target" placeholder="e.g. 1500000">
+                            </div>
+                            <button class="primary-btn mt-6 full-width" id="btn-add-goal">Start Tracking</button>
+                        </div>
+                        <div class="widget glass">
+                            <h3 class="widget-title">Active Goals</h3>
+                            <div class="recent-list" id="goals-list">
+                                <p class="text-secondary p-4 text-center border-dashed rounded mt-4">No goals initialized.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ==================== ANALYTICS VIEW ==================== -->
+                <div id="view-analytics" class="app-view">
+                    <div class="view-header"><h2>Advanced Data Analytics</h2><p class="text-secondary">Deep dive into your spending habits.</p></div>
+                    <div class="analytics-grid">
+                        <div class="widget glass">
+                            <h3 class="widget-title">Expense Distribution (Linear)</h3>
+                            <div class="canvas-container" style="height: 350px;"><canvas id="categoryChart"></canvas></div>
+                        </div>
+                        <div class="widget glass">
+                            <h3 class="widget-title">Category Breakdown (Radial)</h3>
+                            <div class="canvas-container" style="height: 350px;"><canvas id="doughnutChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Massive Logic Bundle -->
+    <script src="script.js"></script>
+</body>
+</html>
+
